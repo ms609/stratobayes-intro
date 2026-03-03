@@ -1,0 +1,1 @@
+{"frames":[],"message":"Error in StratData(signal = d34S, signalColumn = c(\"d34S\"), referenceSite = \"Staithes\",  : \n  unused arguments (heightScale = \"depth\", lith = lith)\n"}

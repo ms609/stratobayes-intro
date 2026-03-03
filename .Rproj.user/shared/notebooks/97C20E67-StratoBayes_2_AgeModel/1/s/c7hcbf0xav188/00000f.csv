@@ -1,0 +1,2 @@
+"0","# read data set used in example 1"
+"0","d34S <- read.csv(""data/d34S-Staithes-and-North-Sea.csv"")"

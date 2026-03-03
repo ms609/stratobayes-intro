@@ -1,0 +1,5 @@
+"0","partsStaithes <- data.frame(lith = c(""Changhsingian"", ""gap"", "
+"0","                                     ""Anisian-Lad"", ""C-N""),"
+"0","                            depth = c(2080, 2080, 1600, 1200),"
+"0","                            site = rep(""Staithes"", 4))"
+"0",""

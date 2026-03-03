@@ -1,0 +1,9 @@
+"0","# load StratoBayes library"
+"0","library(""StratoBayes"")"
+"0","# read data with the StratData function"
+"0","stratDat <- StratData(signal = d34S, signalColumn = c(""d34S""), "
+"0","                      referenceSite = ""Staithes"", zScale = ""depth"","
+"0","                      zColumn = ""depth"", ties = ties, parts = lith)"
+"2","Error in .CheckDataColumns(parts, columns = c(zColumn, siteColumn, partitionColumn),  : 
+  parts is missing the following columns: partition
+"
