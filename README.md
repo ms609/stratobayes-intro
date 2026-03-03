@@ -7,6 +7,6 @@ correlation in StratoBayes.
 
 ## See also:
 
-- [Download StratoBayes](https://stratobayes.github.io/)
+- [Download StratoBayes](https://www.stratobayes.com/signup)
 
 - [Full tutorial](https://stratobayes.github.io/vignettes/StratoBayes.html)
