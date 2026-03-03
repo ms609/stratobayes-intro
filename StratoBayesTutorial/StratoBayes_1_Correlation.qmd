@@ -1,5 +1,5 @@
 ---
-title: "Introduction to stratigraphic correlation using StratoBayes"
+title: "Stratigraphic correlation using StratoBayes"
 subtitle: "GEOL50215"
 
 # Define multiple outputs
@@ -124,8 +124,8 @@ plot(stratDat)
 
 We can now think about how we want to align the two sections. A simple option would be to shift the North Sea section and apply a "stretch" factor that compresses the section to match the Staithes section. The Staithes section is thus our reference section and remains unchanged. We need a single "stretch" factor or sedimentation rate ($\gamma$) for the aligned section, as well as an offset or shift that corresponds to the depth in the reference section to which the bottom of the aligned section will be shifted ($\alpha$).
 
-Calculating the depth at the reference site (Staithes) that corresponds to a depth at the North Sea site is done as follows: $$depth_{Staithes} = \alpha + \gamma * \Delta_{North Sea}~,$$\
-where $\Delta_{North Sea}$ is the distance from the bottom of the North Sea section to the depth of interest.
+Calculating the depth at the reference site (Staithes) that corresponds to a depth at the North Sea site is done as follows: $$depth_{\mathrm{Staithes}} = \alpha + \gamma * \Delta_{\mathrm{North Sea}}~,$$\
+where $\Delta_{\mathrm{North Sea}}$ is the distance from the bottom of the North Sea section to the depth of interest.
 
 *Note that depths are internally multiplied by -1 to allow for calculations as if measurements were on the height scale, and for easier plotting*.
 
@@ -174,12 +174,13 @@ To run the MCMC to estimate the posterior of the model parameters, we need to pa
 
 ```{r RunStratModel 1, eval = FALSE}
 # run model and save results to an R object named "result"
+set.seed(1) # Set random seed for reproducibility
 result <- RunStratModel(stratObject = stratDat, alignmentScale = "height", 
                         sedModel = "site", priors = priors,  
                         nRun = 1, nIter = 4000)
 ```
 
-```{r read result for speed, echo = FALSE}
+```{r read-result-for-speed, echo = FALSE}
 result <- readRDS("data/model-result-1.rds")
 ```
 
@@ -188,46 +189,45 @@ result <- readRDS("data/model-result-1.rds")
 ## Plotting an alignment
 We can visualise the correlation resulting from the model run with the `plot` function. Again, the function will recognise that `result` is an object of class "StratPosterior" and visualise it accordingly. We can use standard plot arguments such as "xlab" to modify the resulting figure.
 
-```{r plot results 1, fig.width=4, fig.height=5.5}
+```{r plot-results-1, fig.width=4, fig.height=5.5}
 #| label: fig-6
 #| fig-cap: Most likely alignment estimated by the model run. The North Sea data are plotted at the median reference section depths. 
 plot(result, xlab = expression(delta ^ 34 * S))
 ```
 
-Per default, `plot()` shows the data from the reference site (Staithes) along with the shifted section (North Sea) on the depth scale of the reference section. The heights of the data points from the North Sea curve are drawn at their median reference section depths ($50^{th}$ percentile, p50), calculated from the posterior draws corresponding to the most likely alignment (alignment 1/3). In this case, the result suggests more than one (i.e. three) possible alignments. The different, discrete alignments are determined by performing a clustering analysis on the posterior samples of the model parameters, $\alpha_{North Sea}$ and $\log \gamma_{North Sea}$ in our case. Per default, the first half of all samples (iterations of the MCMC) are discarded as burn-in, and are not included in the clustering analysis or in the display of the results.
+Per default, `plot()` shows the data from the reference site (Staithes) along with the shifted section (North Sea) on the depth scale of the reference section. The heights of the data points from the North Sea curve are drawn at their median reference section depths ($50^{th}$ percentile, p50), calculated from the posterior draws corresponding to the most likely alignment (alignment 1/2). In this case, the result suggests more than one (i.e. two) possible alignments. The different, discrete alignments are determined by performing a clustering analysis on the posterior samples of the model parameters, $\alpha_{\mathrm{North Sea}}$ and $\log \gamma_{\mathrm{North Sea}}$ in our case. Per default, the first half of all samples (iterations of the MCMC) are discarded as burn-in, and are not included in the clustering analysis or in the display of the results.
 
-Let us visualise the other possible alignments alongside the first:
+Let us visualise the other possible alignment alongside the first:
 
 ```{r plot results 2, fig.width=8.5, fig.height=5}
 #| label: fig-7
-#| fig-cap: Three distinct alignments found in the posterior of the model run. 
-par(mar = c(4, 4, 1, 1), mfrow = c(1, 3))
+#| fig-cap: Two distinct alignments found in the posterior of the model run. 
+par(mar = c(4, 4, 1, 1), mfrow = c(1, 2))
 plot(result, xlab = expression(delta^34*S), overridePar = FALSE)
 plot(result, xlab = expression(delta^34*S), overridePar = FALSE, alignment = 2)
-plot(result, xlab = expression(delta^34*S), overridePar = FALSE, alignment = 3)
 ```
 
-The three alignments don't look very different -- the major peak at -600 m is always aligned.
+The alignments don't look very different -- the major peak at -600 m is always aligned.
 
 ## The parameter estimates
 
-To understand why the results suggest these different alignments, we can inspect the parameter estimates. Visualising the posterior samples in a histogram works by specifying `show = "histogram"` in the plot function. We want to show both the $\alpha_{North Sea}$ and $\log \gamma_{North Sea}$ parameters, and colour the parameter values by the alignment they have been classified in the cluster analysis:
+To understand why the results suggest these different alignments, we can inspect the parameter estimates. Visualising the posterior samples in a histogram works using the `hist` function. We want to show both the $\alpha_{\mathrm{North Sea}}$ and $\log \gamma_{\mathrm{North Sea}}$ parameters, and colour the parameter values by the alignment they have been classified in the cluster analysis:
 
 ```{r histogram 1, fig.width=6, fig.height=4.5}
 #| label: fig-8 
 #| fig-cap: Histograms of the posterior samples of the alpha and gamma parameter.
 par(mar = c(4, 4, 0.5, 0.5))
-plot(result, show = "histogram", params = c(1, 2), colourBy = "alignment")
+hist(result, parameters = c(1, 2), colourBy = "alignment")
 ```
 
-Now it is clear why the results suggest three distinct alignments. Note that one posterior sample has not been assigned to any cluster ("alignment 0"). 
+The peaks may not exhibit the same posterior density, but we can now see why the results suggest distinct alignments. Note that a small number of posterior samples have not been assigned to any cluster ("alignment 0").
 
 We can also visualise the parameters in 2D:
 
 ```{r crossplot 1, fig.width=4.75, fig.height=3.5}
 #| label: fig-9
 #| fig-cap: Cross plot of the posterior samples of the alpha and gamma parameter.
-plot(result, show = "crossplot", colourBy = "alignment")
+ScatterPlot(result, colourBy = "alignment")
 ```
 
 ## Assessing convergence
@@ -238,17 +238,17 @@ An important step in evaluating the model results is to check whether the chain(
 #| label: fig-10
 #| fig-cap: Trace plot showing the posterior samples of the alpha and gamma parameter in the sequence in which they were obtained during the MCMC (after burn-in).
 par(mar = c(4, 4, 0.5, 0.5))
-plot(result, show = "traceplot", params = c(1, 2))
+TracePlot(result, parameters = c(1, 2))
 ```
 
-Here we can see that while the chain looks like it may have converged (they don't seem to shift into new, unexplored areas over time), the chain rarely shifts between the three distinct modes. If we had let the model run for longer, we would probably get somewhat different estimates for the model parameters and the probabilities of different alignments.
+Here we can see that while the chain looks like it may have converged (they don't seem to shift into new, unexplored areas over time), the chain rarely shifts between distinct modes. If we had let the model run for longer, we would probably get somewhat different estimates for the model parameters and the probabilities of different alignments.
 
 Another tool to assess convergence is to to look at the posterior probabilities associated with each of the samples obtained from the MCMC:
 
 ```{r log posterior 1, fig.width=8, fig.height=3.5}
 #| label: fig-11
 #| fig-cap: Evolution of the log posterior density during the MCMC (after burn-in).
-plot(result, show = "logpost")
+TracePlot(result, parameters = "posterior")
 ```
 
 The log posterior being relatively stable is a good sign. If it would increase with increasing iteration number, this would be a tell that the chain hasn't converged yet.
@@ -257,10 +257,10 @@ Ideally, more than one independent model run is conducted. If they all give a si
 
 ## Depths on reference scale
 
-To get the depth in the reference section (Staithes) that correspond to the shifted depths of the aligned North Sea section, the `AgeModel()` function can be used. For example, the depths at the Staithes site that correspond to $-1900 \, \text{m}$ and $-2400 \, \text{m}$ at the North Sea site (`site = 2`) can be computed as follows:
+To get the depth in the reference section (Staithes) that correspond to the shifted depths of the aligned North Sea section, the `StratMap()` function can be used. For example, the depths at the Staithes site that correspond to $-1900 \, \text{m}$ and $-2400 \, \text{m}$ at the North Sea site (`site = 2`) can be computed as follows:
 
 ```{r AgeConversion 1}
-AgeModel(result, heights = c(-1900, -2400), site = 2, alignment = "all")
+StratMap(result, heights = c(-1900, -2400), site = 2, alignment = "all")
 ```
 
 A depth of $-1900 \, \text{m}$ from the North Sea well corresponds to a mean depth of $-636 \, \text{m}$ in the Staithes well. Note that this depth comes with uncertainty, in this case, the 95% credible interval, spanned by the $0.025$ and the $0.975$ quantiles ranges from $-641.9 \, \text{ to } -631.0 \, \text{m}$. This is quite a low uncertainty, as the the prominent $\delta^{34}S_{evap}$ peak in well
@@ -270,17 +270,15 @@ The uncertainty around the reference depth corresponding to $-2400 \, \text{m}$ 
 If we want to just use one alignment to compute the reference depth and uncertainty, we can specify for example `alignment = 1` to use alignment 1:
 
 ```{r AgeConversion 2}
-AgeModel(result, heights = c(-1900, -2400), site = 2, alignment = 1)
+StratMap(result, heights = c(-1900, -2400), site = 2, alignment = 1)
 ```
 
 Here, the uncertainty of the reference depth corresponding to $-2400 \, \text{m}$ is much lower.
 
-We can visualise the reference depths corresponding to North Sea depths by using the "agemodel" option in the `plot()` function:
+We can visualise the reference depths corresponding to North Sea depths by using the `StratMapPlot()` function:
 
 ```{r age model 1, fig.width=4.5, fig.height=4.5}
 #| label: fig-12
 #| fig-cap: Median depths (line) with 95% credible intervals (shading) in the reference section (Staithes) corresponding to depths in the North Sea section, using all alignments from the posterior (after burn-in).
-plot(result, show = "agemodel", alignment = "all")
+StratMapPlot(result, alignment = "all")
 ```
-
-
