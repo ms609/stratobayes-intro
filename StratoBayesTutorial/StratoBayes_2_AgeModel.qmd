@@ -61,7 +61,7 @@ Start with just a few units, to keep the model simple.
 Create a data.frame with the following structure:
 
 ```{r lithology partitions Staithes hint, eval = FALSE}
-partsStaithes <- data.frame(lith = ,
+partsStaithes <- data.frame(partition = ,
                             depth = ,
                             site = )
 ```
@@ -94,7 +94,7 @@ Anisian, as is indicated in [Figure 1](#fig-1) .
 ## Step 2: Create a dataframe with lithological or stratigraphic units for the North Sea section (well 42/28-2)
 
 Then, join the two dataframes. Optionally, if you used depths in feet,
-convert depths to meters (1 foot = 0.3048m)
+convert depths to meters (1 foot = 0.3048&nbsp;m)
 :::
 
 ::: {.callout-caution collapse="true"}
@@ -537,9 +537,9 @@ additional options:
 
 Mandatory:
 
--   `data` The stratigraphic data read with the `StratData()` function.
+-   `stratObject` The stratigraphic data read with the `StratData()` function.
 
--   `scale` Specifying whether the model should run on the "height" or
+-   `alignmentScale` Specifying whether the model should run on the "height" or
     "age" scale
 
 -   `sedModel` The sedimentation rate model
@@ -575,7 +575,7 @@ Often useful:
     are still investigating which situations require adjustments to this
     penalty.
     
--   `randomSeeds` Specify random seeds to make the model run reproducible.
+-   `seed` Specify random seeds to make the model run reproducible.
 
 It is advisable to do a test run with relatively few iterations, to
 check that it is working as intended.
